@@ -84,15 +84,15 @@ extract.coding.regions <- function(DNAStringSet, ref_seq, cores = parallelly::av
 
 
 # # Example of functionality
-library(genbankr)
-library(Biostrings)
-library(tidyverse)
-library(foreach)
-library(parallel)
-library(parallelly)
-library(doParallel)
-
-ref_seq="/scratch/tporter/RSV_20240215_Updated_RSV_Phylogenies/Reference/RSVA_LR699737.gb"
-DNAStringSet=readDNAStringSet("/scratch/tporter/RSV_20240215_Updated_RSV_Phylogenies/RSV_A_Typed_All_Outliersremoved2/RSV_A_Typed_All_outliersremoved2.fasta")
-DNAStringSet <- DNAStringSet[1:40]
-RSV_A_Coding <- extract.coding.regions(DNAStringSet, ref_seq)
+# library(genbankr)
+# library(Biostrings)
+# library(tidyverse)
+# library(foreach)
+# library(parallel)
+# library(parallelly)
+# library(doParallel)
+#
+# ref_seq="/scratch/tporter/RSV_20240215_Updated_RSV_Phylogenies/Reference/RSVA_LR699737.gb"
+# DNAStringSet=readDNAStringSet("/scratch/tporter/RSV_20240215_Updated_RSV_Phylogenies/RSV_A_Typed_All_Outliersremoved2/RSV_A_Typed_All_outliersremoved2.fasta")
+# DNAStringSet <- DNAStringSet[1:40]
+# RSV_A_Coding <- extract.coding.regions(DNAStringSet, ref_seq)
