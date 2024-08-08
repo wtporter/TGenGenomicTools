@@ -92,7 +92,7 @@ snps.to.amino <- function(snp_db, ref_seq, cores = parallelly::availableCores())
 
   Out <- full_join(Amino_Acid_List, Temp)
 
-  Out$AA[is.na(Out$AA) & nchar(Out$snp_mutation)] <- "Insertions Not Supported"
+  Out$AA[is.na(Out$AA) & nchar(Out$snp_mutation) > 1] <- "Insertions Not Supported"
 
   Out$AA[is.na(Out$AA) & Out$snp_mutation == "_"] <- "Deletions Not Supported"
 
