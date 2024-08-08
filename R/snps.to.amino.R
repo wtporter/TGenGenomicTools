@@ -92,6 +92,10 @@ snps.to.amino <- function(snp_db, ref_seq, cores = parallelly::availableCores())
 
   Out <- full_join(Amino_Acid_List, Temp)
 
+  Out$AA[is.na(Out$AA) & nchar(Out$snp_mutation)] <- "Insertions Not Supported"
+
+  Out$AA[is.na(Out$AA) & Out$snp_mutation == "_"] <- "Deletions Not Supported"
+
   Out$AA[is.na(Out$AA)] <- "Non-coding SNP"
 
   Out <- select(Out, SNP, AA, Gene, Product, Theoretical_Reference)
@@ -109,9 +113,9 @@ snps.to.amino <- function(snp_db, ref_seq, cores = parallelly::availableCores())
 # library(parallelly)
 # library(doParallel)
 # snp_db <- fasta.to.snps(fasta="/scratch/tporter/RSV_20230402_SequencingMethodCompare_SQL/RSV_A_Fasta/TGen_Clinical_RSVA.fasta",
-#                         ref_seq="/scratch/tporter/RSV_20230630_Phylogenetic_Analysis/RSV_A.gb",
+#                         ref_seq="/scratch/tporter/RSV_20230630_Phylogenetic_Analysis/",
 #                         cores=parallelly::availableCores())
-#snp_db <- read.csv("/scratch/tporter/RSV_20230908_HomoplasticSNPAnalysis/RSV_A_Homoplastic.csv")
+# snp_db <- read.csv("/scratch/tporter/RSV_20230908_HomoplasticSNPAnalysis/RSV_A_Homoplastic.csv")
 # ref_seq="/scratch/tporter/RSV_20230825_ROI_Formatting/RSV_A_NC_038235.1.gb"
 # snp_db <- dplyr::select(snp_db, SNP)
 # snps.to.amino(snp_db, ref_seq)
