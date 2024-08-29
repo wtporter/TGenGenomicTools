@@ -2,6 +2,7 @@
 
 export(extract.coding.regions)
 export(fasta.to.snps)
+export(genome.snp.to.gene.snp)
 export(snps.to.amino)
 import(Biostrings)
 import(doParallel)

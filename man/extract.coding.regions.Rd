@@ -4,12 +4,16 @@
 \alias{extract.coding.regions}
 \title{Extract Coding Regions}
 \usage{
-\method{extract}{coding.regions}(DNAStringSet, ref_seq, cores = parallelly::availableCores())
+extract.coding.regions(
+  DNAStringSet,
+  ref_seq,
+  cores = parallelly::availableCores()
+)
 }
 \arguments{
 \item{DNAStringSet}{A DNAStringSet object with sequences to be analyzed.}
 
-\item{ref_seq}{A path to a reference sequence (.gb) format.}
+\item{ref_seq}{A .gb file opened with genbankr::readGenBank to be used as the reference sequence. Check to make sure the @sequence and @transcript slots are full.}
 
 \item{cores}{Option to specify number of cores to use.}
 }
