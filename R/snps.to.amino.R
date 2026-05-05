@@ -19,9 +19,18 @@ snps.to.amino <- function(snp_db, ref_seq, cores = parallelly::availableCores())
 
   library(tidyverse)
   # Read in the reference sequence
-  reference <- genbankr::readGenBank(ref_seq)
+  reference <- suppressWarnings(genbankr::readGenBank(ref_seq))
   # Save list of CDS regions
   Reference_DF <- data.frame(reference@cds)
+  # This converts Bioconductor "CharacterLists" into standard character vectors #2026/05 UPDATE!!!
+  Reference_DF <- as.data.frame(lapply(Reference_DF, function(x) if(is.list(x)) sapply(x, paste, collapse=";") else x))
+
+  Reference_DF$experiment <- NULL
+  Reference_DF$inference <- NULL
+  # This converts Bioconductor "CharacterLists" into standard character vectors #2026/05 UPDATE!!!
+  Reference_DF <- Reference_DF %>%
+    mutate(across(where(~inherits(.x, "CharacterList")),
+                  ~sapply(.x, paste, collapse = "; ")))
   #Create new column of CDS nucleotide sequence
   Reference_DF$sequence <- "No Seq"
   #Fill nucleotide sequence
@@ -53,7 +62,7 @@ snps.to.amino <- function(snp_db, ref_seq, cores = parallelly::availableCores())
 
     Out <- data.frame()
 
-    if(MUTATION !="_"& nchar(MUTATION) == 1){
+    if(MUTATION != "_" & nchar(MUTATION) == 1){
 
       for (GENE in 1:nrow(Reference_DF)) {
 
@@ -97,17 +106,17 @@ snps.to.amino <- function(snp_db, ref_seq, cores = parallelly::availableCores())
             Biostrings::mismatchTable() %>%
             mutate(AA_Change = paste(Reference_DF$gene[GENE], ":", PatternSubstring, PatternStart, SubjectSubstring, sep = ""))
 
-          Out <- rbind(Out, data.frame("SNP" = GENOME_SNP,
+          Out <- rbind(Out, data.frame("SNP" = as.character(GENOME_SNP),
                                        "snp_position_genome" = POSITION,
                                        "snp_position_gene" = SNP_in_gene,
-                                       "snp_mutation" = MUTATION,
-                                       "Theoretical_Reference" = Theoretical_Ref,
-                                       "Gene" = Reference_DF$gene[GENE],
-                                       "Product" = Reference_DF$product[GENE],
-                                       "AA" = ifelse(length(as.character(unique(Mutations$AA_Change))) > 0 ,
+                                       "snp_mutation" = as.character(MUTATION),
+                                       "Theoretical_Reference" = as.character(Theoretical_Ref),
+                                       "Gene" = as.character(Reference_DF$gene[GENE]),
+                                       "Product" = as.character(Reference_DF$product[GENE]),
+                                       "AA" = as.character(ifelse(length(as.character(unique(Mutations$AA_Change))) > 0 ,
                                                                                              as.character(unique(Mutations$AA_Change)),
-                                                                                             "Synonymous"),
-                                        "SNP_Gene" = paste0(Theoretical_Ref, SNP_in_gene, MUTATION)))
+                                                                                             "Synonymous")),
+                                        "SNP_Gene" = as.character(paste0(Theoretical_Ref, SNP_in_gene, MUTATION))))
         }
       }
     }
@@ -119,18 +128,20 @@ snps.to.amino <- function(snp_db, ref_seq, cores = parallelly::availableCores())
   # Stop the parallel cluster
   stopCluster(cl)
 
-  Out <- full_join(select(Amino_Acid_List, SNP), Temp)
+  Out <- full_join(Amino_Acid_List, select(Temp, -snp_mutation))
 
-  Out$AA[is.na(Out$AA) & nchar(Out$snp_mutation) > 1] <- "Insertions Not Supported"
+  #2026 Addition
+  Out$snp_mutation <- as.character(unlist(Out$snp_mutation))
+
+  Out$AA[is.na(Out$AA) & nchar(as.character(Out$snp_mutation)) > 1] <- "Insertions Not Supported"
   Out$AA[is.na(Out$AA) & Out$snp_mutation == "_"] <- "Deletions Not Supported"
   Out$AA[is.na(Out$AA)] <- "Non-coding SNP"
 
-  Out$SNP_Gene[is.na(Out$SNP_Gene) & nchar(Out$snp_mutation) > 1] <- "Insertions Not Supported"
+  Out$SNP_Gene[is.na(Out$SNP_Gene) & nchar(as.character(Out$snp_mutation)) > 1] <- "Insertions Not Supported"
   Out$SNP_Gene[is.na(Out$SNP_Gene) & Out$snp_mutation == "_"] <- "Deletions Not Supported"
   Out$SNP_Gene[is.na(Out$SNP_Gene)] <- "Non-coding SNP"
 
   Out
-
 
   Out <- select(Out, SNP, SNP_Gene, AA, Gene, Product, Theoretical_Reference)
 

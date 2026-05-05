@@ -19,7 +19,7 @@ genome.snp.to.gene.snp <- function(snp_db, ref_seq, cores = parallelly::availabl
 
   library(tidyverse)
   # Read in the reference sequence
-  reference <- genbankr::readGenBank(ref_seq)
+  reference <- suppressWarnings(genbankr::readGenBank(ref_seq))
   # Save list of CDS regions
   Reference_DF <- left_join(data.frame(reference@genes), data.frame(reference@cds) %>%
                               select(locus_tag, product, translation))
